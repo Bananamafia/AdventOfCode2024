@@ -1,16 +1,29 @@
 pub mod day01 {
     pub fn solve_part_1(input: &str) -> i32 {
-        let mut values: (Vec<i32>, Vec<i32>) = get_values_from(input);
+        let (mut left_values, mut right_values): (Vec<i32>, Vec<i32>) = get_values_from(input);
 
-        let mut left_values = values.0;
-        let mut right_values = values.1;
         left_values.sort();
         right_values.sort();
 
         let mut solution: i32 = 0;
         while !left_values.is_empty() {
             solution += (right_values.pop().expect("No value remaining.")
-                - left_values.pop().expect("No value remaining.")).abs();
+                - left_values.pop().expect("No value remaining."))
+            .abs();
+        }
+
+        return solution;
+    }
+
+    pub fn solve_part_2(input: &str) -> i32 {
+        let (mut left_values, mut right_values): (Vec<i32>, Vec<i32>) = get_values_from(input);
+
+        let mut solution: i32 = 0;
+
+        for left_value in left_values {
+            let appearances = right_values.iter().filter(|i: &&i32| **i == left_value).count();
+
+            solution += left_value * appearances as i32;
         }
 
         return solution;
@@ -57,6 +70,15 @@ pub mod day01 {
             let expected: i32 = 11;
 
             let actual: i32 = solve_part_1(SAMPLE_INPUT);
+
+            assert_eq!(actual, expected);
+        }
+
+        #[test]
+        fn part2() {
+            let expected: i32 = 31;
+
+            let actual: i32 = solve_part_2(SAMPLE_INPUT);
 
             assert_eq!(actual, expected);
         }
