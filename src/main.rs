@@ -1,3 +1,8 @@
+use std::fs;
+mod day01;
+
 fn main() {
-    println!("Hello, world!");
+    let input = fs::read_to_string("inputs/day01.txt").expect("No file found");
+
+    print!("Solution: {}", day01::day01::solve_part_1(&input));
 }
