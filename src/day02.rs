@@ -14,23 +14,47 @@ pub mod day02 {
     }
 
     pub fn solve_part_2(input: &str) -> i32 {
-        unimplemented!();
-    }
+        let levels = get_values(input);
 
-    fn get_values(input: &str) -> Vec<Vec<i32>> {
-        let mut output: Vec<Vec<i32>> = Vec::new();
+        let mut solution = 0;
 
-        for line in input.lines() {
-            let split_line: Vec<&str> = line.split_whitespace().collect::<Vec<&str>>();
-            let values_of_line: Vec<i32> = split_line
-                .iter()
-                .map(|v| v.parse::<i32>().unwrap())
-                .collect();
-            output.push(values_of_line);
+        for level in levels {
+            let mut has_solution:bool = false;
+
+            for i in 0..level.len() {
+                if has_solution {
+                    continue;
+                }
+
+                let mut stripped_level: Vec<i32> = level.clone();
+                stripped_level.remove(i);
+
+                if is_row(&stripped_level) && are_steps_smaller_3(&stripped_level){
+                    solution += 1;
+                    has_solution = true;
+                }
+            }
+
+            has_solution = false;
         }
 
-        output
+        solution
     }
+
+        fn get_values(input: &str) -> Vec<Vec<i32>> {
+            let mut output: Vec<Vec<i32>> = Vec::new();
+
+            for line in input.lines() {
+                let split_line: Vec<&str> = line.split_whitespace().collect::<Vec<&str>>();
+                let values_of_line: Vec<i32> = split_line
+                    .iter()
+                    .map(|v| v.parse::<i32>().unwrap())
+                    .collect();
+                output.push(values_of_line);
+            }
+
+            output
+        }
 
     fn is_row(levels: &Vec<i32>) -> bool {
         is_increasing(&levels) || is_decreasing(&levels)
@@ -70,7 +94,10 @@ pub mod day02 {
     mod tests {
         use super::*;
 
-        const SAMPLE_INPUT: &str = "7 6 4 2 1
+        const SAMPLE_INPUT: &str = "1 3 2 3 4
+1 2 3 4 9
+9 1 2 3 4
+7 6 4 2 1
 1 2 7 8 9
 9 7 6 2 1
 1 3 2 4 5
@@ -80,6 +107,9 @@ pub mod day02 {
         #[test]
         fn get_values_test() {
             let expected: Vec<Vec<i32>> = vec![
+                vec![1, 3, 2, 3, 4],
+                vec![1, 2, 3, 4, 9],
+                vec![9, 1, 2, 3, 4],
                 vec![7, 6, 4, 2, 1],
                 vec![1, 2, 7, 8, 9],
                 vec![9, 7, 6, 2, 1],
@@ -98,6 +128,15 @@ pub mod day02 {
             let expected: i32 = 2;
 
             let actual: i32 = solve_part_1(SAMPLE_INPUT);
+
+            assert_eq!(actual, expected);
+        }
+
+        #[test]
+        fn solve_part_2_test() {
+            let expected = 7;
+
+            let actual: i32 = solve_part_2(SAMPLE_INPUT);
 
             assert_eq!(actual, expected);
         }
