@@ -1,5 +1,5 @@
 pub mod day07 {
-    use std::collections::VecDeque;
+    use std::collections::{HashSet, VecDeque};
 
     pub fn solve_part_1(input: &str) -> i64 {
         let equations: Vec<(i64, Vec<i64>)> = get_equations(input);
@@ -15,6 +15,43 @@ pub mod day07 {
         solution
     }
 
+    pub fn solve_part_2(input: &str) -> i64 {
+        let equations: Vec<(i64, Vec<i64>)> = get_equations(input);
+
+        let mut solution: i64 = 0;
+
+        for equation in equations {
+            let mut subset: VecDeque<i64> = VecDeque::from(equation.1);
+            let mut possible_solutions =
+                get_possible_solutions_part2(HashSet::from_iter((vec![subset.pop_front().unwrap()]).iter().cloned()), Option::None);
+            for value in subset {
+                possible_solutions = get_possible_solutions_part2(possible_solutions, Option::from(value));
+            }
+
+            if possible_solutions.contains(&equation.0){
+                solution += equation.0;
+            }
+        }
+
+        solution
+    }
+
+    fn get_possible_solutions_part2(values: HashSet<i64>, combiner: Option<i64>) -> HashSet<i64> {
+        if combiner.is_none() {
+            return values;
+        }
+
+        let mut possible_values: HashSet<i64> = HashSet::new();
+
+        for value in values {
+            possible_values.insert(value + combiner.unwrap());
+            possible_values.insert(value * combiner.unwrap());
+            possible_values.insert(format!("{}{}", value, combiner.unwrap()).parse::<i64>().unwrap());
+        }
+
+        possible_values
+    }
+
     pub fn has_correct_equations(expected: i64, values: Vec<i64>) -> bool {
         let operation_count = values.len() - 1;
         let mut binary_operation = (1 << operation_count) - 1;
@@ -24,20 +61,17 @@ pub mod day07 {
             let mut calculation: i64 = values.pop_front().unwrap();
 
             for char in format!("{:0n$b}", binary_operation, n = operation_count).chars() {
-
-                if char == '1'{
+                if char == '1' {
                     calculation *= values.pop_front().unwrap();
-                }
-                else{
+                } else {
                     calculation += values.pop_front().unwrap();
                 }
-
             }
 
             binary_operation -= 1;
 
             if calculation == expected {
-                return true
+                return true;
             }
         }
 
@@ -101,6 +135,15 @@ pub mod day07 {
             let expected: i64 = 3749;
 
             let actual: i64 = solve_part_1(SAMPLE_INPUT);
+
+            assert_eq!(expected, actual);
+        }
+
+        #[test]
+        fn test_solve_part2() {
+            let expected: i64 = 11387;
+
+            let actual: i64 = solve_part_2(SAMPLE_INPUT);
 
             assert_eq!(expected, actual);
         }
